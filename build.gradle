@@ -1,17 +1,23 @@
 plugins {
     id 'java'
     // id 'io.spring.dependency-management'
-    // id 'org.springframework.boot'
+    id 'org.springframework.boot' version '1.5.2.RELEASE'
+    id 'application'
 }
 
 group 'db.interview'
 version '1.0-SNAPSHOT'
+//mainClassName = "db.interview.Swagger2SpringBoot"
 
 sourceCompatibility = 1.8
 
 ext {
     springBootVersion = '1.5.9.RELEASE'
     springFoxVersion = '2.7.0'
+}
+
+springBoot {
+    mainClass = "db.interview.Swagger2SpringBoot"
 }
 
 repositories {
