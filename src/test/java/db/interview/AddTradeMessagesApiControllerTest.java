@@ -4,37 +4,41 @@ import io.swagger.api.AddTradeMessageApiController;
 import io.swagger.api.ListTradeMessagesApiController;
 import io.swagger.model.SendTradeMessage;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 //import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 
-@Ignore
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = {Swagger2SpringBoot.class})
 public class AddTradeMessagesApiControllerTest {
+
+    private final Logger log = LoggerFactory.getLogger(AddTradeMessagesApiControllerTest.class);
 
     @Autowired
     private MockMvc mockMvc;
@@ -110,24 +114,21 @@ public class AddTradeMessagesApiControllerTest {
                 //.andExpect(jsonPath("$", hasSize(0)));
 
         mockMvc.perform(post("/c5764/dbInterviewShowcase/1.0.0/addTradeMessage")
-                        .header("accept", "application/json")
-                        .param("tradeMessage", TEST_INPUT_1))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .requestAttr("tradeMessage", TEST_INPUT_1)
+                        .param("tradeMessage", TEST_INPUT_1)
+                        .content("{\"tradeMessage\":\"" + TEST_INPUT_1 + "\"}"))
                         .andDo(print())
                         .andExpect(status().isOk());
 
-        mockMvc.perform(get("/c5764/dbInterviewShowcase/1.0.0/listTradeMessages")
-                .header("accept", "application/json"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
+        MvcResult result = mockMvc.perform(get("/c5764/dbInterviewShowcase/1.0.0/listTradeMessages")
+                                  .header("accept", "application/json"))
+                                  .andReturn();
 
+        log.info("the result: " + result.getResponse().getContentAsString());
+        log.info("the result: " + result.getResponse().getStatus());
+
+        assertEquals(200, result.getResponse().getStatus());
     }
 
-    //@Test
-    //public void shouldReturnDefaultMessage() throws Exception {
-    //    this.mockMvc.perform(get("/c5764/dbInterviewShowcase/1.0.0/listTradeMessages")
-    //            .header("accept", "application/json"))
-    //            .andDo(print())
-    //            .andExpect(status().isOk());
-    //}
 }
