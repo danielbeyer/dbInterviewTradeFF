@@ -3,33 +3,40 @@ package db.interview;
 import io.swagger.api.ListTradeMessagesApiController;
 import io.swagger.model.TradeMessage;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Hashtable;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Ignore
-@SpringBootTest(classes = Swagger2SpringBoot.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes = {Swagger2SpringBoot.class})
 public class ListTradeMessagesApiControllerTest {
 
-    //@Autowired
-    //private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private ListTradeMessagesApiController listTradeMessagesApiController;
 
     @Autowired
-    private ListTradeMessagesApiController tradesApiController;
-
-    @Bean
-    public Hashtable<String, TradeMessage> tradeDataStore() {
-        return new Hashtable<>();
-    }
-
+    public Hashtable<String, TradeMessage> tradeDataStore;
 
     @Before
     public void fillTradeDate() {
@@ -41,48 +48,19 @@ public class ListTradeMessagesApiControllerTest {
         tm.setSecNo("514000");
         tm.setNumbers("+0000021,000");
 
-        tradeDataStore().put(tm.getStmtId(), tm);
+        tradeDataStore.put(tm.getStmtId(), tm);
     }
 
     @Test
-    public void contexLoads() throws Exception {
-        assertThat(tradesApiController).isNotNull();
+    public void contexLoadsList() throws Exception {
+        assertThat(listTradeMessagesApiController).isNotNull();
     }
 
-
-    //@MockBean
-    //private ListTradeMessagesApiController tradeMessagesApiController;
-
-//    @Test
-//    public void listTradeMessagesTest() throws Exception {
-//        TradeMessage tm = new TradeMessage();
-//        tm.setStmtId("12341234FFFF");
-//        tm.setDbTimestamp(OffsetDateTime.now());
-//        tm.setTradeDate(LocalDate.now());
-//        tm.acctNo(1234567);
-//        tm.setSecNo("514000");
-//        tm.setNumbers("+0000021,000");
-//
-//        List<TradeMessage> allTrades = singletonList(tm);
-//        ResponseEntity<List<TradeMessage>> response = new ResponseEntity(allTrades, HttpStatus.OK);
-//
-//
-//        given(tradeMessagesApiController.listTradeMessages(null, null, null)).willReturn(response);
-//
-//        mvc.perform(get("/listTradeMessages")
-//                .contentType(APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$", hasSize(1)));
-//
-//    }
-
-    //@Test
-    //public void shouldReturnDefaultMessage() throws Exception {
-        //this.mockMvc.perform(get("/listTradeMessages").contentType("application/json")).andExpect(status().isOk());
-
-        //ResultActions perform = this.mockMvc.perform(get("/listTradeMessages"));
-
-        //perform.toString();
-        //        .andExpect(content().string(containsString("Hello, World")));
-    //}
+    @Test
+    public void shouldReturnDefaultMessage() throws Exception {
+        this.mockMvc.perform(get("/c5764/dbInterviewShowcase/1.0.0/listTradeMessages")
+                             .header("accept", "application/json"))
+                             .andDo(print())
+                             .andExpect(status().isOk());
+    }
 }
